@@ -1,0 +1,86 @@
+﻿
+@model EcommerceProject.Models.DTOs.ProductDisplayModel
+
+@{
+    
+}
+
+<div class="my-2">
+    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
+
+  <div class="col-12">
+    <label class="visually-hidden" for="categoryId">Catergories</label>
+            <select class="form-select" id="categoryId" name="categoryId">
+      <option selected>Find By Categroy</option>
+                @foreach(var category in Model.Categories)
+                    {
+                    <option selected="@(category.Id == Model.CategoryId)" value="@category.Id">@category.CategoryName</option>
+                    }
+    </select>
+  </div>
+
+        <div class="col-12">
+            <label class="visually-hidden" for="sterm">Username</label>
+            <div class="input-group">
+                <div class="input-group-text"></div>
+                <input type="text" class="form-control" id="sterm" value="@Model.STerm" name="sterm" placeholder="Search By Name">
+            </div>
+        </div>
+
+
+
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Search</button>
+    <a href="/Home/Index" class="btn btn-dark">Reset</a>
+  </div>
+</form>
+</div>
+
+
+<div class="w-100 mt-4 d-flex flex-wrap">
+    @foreach (var products in Model.Products){
+<div class="card mx-3 mb-4" style="width: 11rem;">
+            @if (string.IsNullOrEmpty(products.Image))
+            {
+                <img style="width:100%;height:180px" src="/images/330px-No-Image-Placeholder.svg.png" class="card-img-top" alt="...">
+            } else
+            {
+                <img style="width:100%;height:180px" src="/images/@products.Image" class="card-img-top" alt="...">
+            }
+    <div class="card-body">
+        <h5 class="card-title">@products.Name</h5>
+        <p class="card-text">
+                    <b>Category:</b>@products.CategoryName <br/>
+                    <b>Price:</b>@products.Price <br />
+                    <b>Colour:</b>@products.Colour <br />
+                    <b>Description:</b>@products.Description <br />
+            
+                </p>
+        <button type="button" onclick="add(@products.Id)" class="btn btn-primary">Add to Cart</button>
+    </div>
+</div>
+    }
+</div>
+
+@section Scripts{
+    <script>
+        async function add(productId){
+            var usernameEL = document.getElementById("username");
+        if(usernameEL==null){
+            window.location.href = "/Identity/Account/Login"
+        }
+            try{
+                var response = await fetch(`/Cart/AddItem?productId=${productId}`);
+                if(response.status==200){
+                    var result = await response .json();
+                    var CartCountEl = document.getElementById("cartCount");
+                    CartCountEl.innerHTML=result;
+                    window.location.href = "#cartCount"
+                }
+            }
+            catch(err){
+                console.log(err);
+            }
+        }
+    </script>
+}
